@@ -32,18 +32,14 @@ class ProjectController{
   async getProject (id){
     const project = firestore.collection("project");
     const data = await project.doc(id).get();
-    const projectResult = [];
 
     if (data.empty) {
       json({ message: "No records found" });
     } else {
-      const project = new Project(
+      return new Project(
         data.data().name,
         data.id
       );
-
-      projectResult.push(project)
-      return projectResult
     }
   };
 
