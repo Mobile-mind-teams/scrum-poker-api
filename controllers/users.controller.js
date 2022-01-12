@@ -24,6 +24,7 @@ class UsersController{
           item.data().role,
           item.data().uid,
           item.data().email,
+          item.id
         );
         usersList.push(user);
       });
@@ -35,25 +36,22 @@ class UsersController{
   async getUser (id){
     const users = firestore.collection("user");
     const data = await users.where("uid","==",id).get();
-    const userResult = [];
+    const user = new User();
 
     if (data.empty) {
       json({ message: "No records found" });
     } else {
       data.forEach((item) => {
-        const user = new User(
-          item.data().user_name,
-          item.data().password,
-          item.data().role,
-          item.data().uid,
-          item.data().email,
-        );
-
-        userResult.push(user)
+          user.user_name = item.data().user_name,
+          user.password = item.data().password,
+          user.role = item.data().role,
+          user.uid = item.data().uid,
+          user.email = item.data().email,
+          user.doc_id = item.id
       });
-      return userResult
-    }
 
+      return user
+    }
   };
 
   async updateUser (data,id) {
