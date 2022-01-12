@@ -1,6 +1,14 @@
-class Story {
+class StorySession {
 
-  constructor(title, description, weight, read_status, agreed_status, visibility, note) {
+  constructor(
+    title,
+    description,
+    weight,
+    read_status,
+    agreed_status,
+    visibility,
+    note,
+    sid) {
           this.title = title;
           this.description = description;
           this.weight = weight;
@@ -8,7 +16,8 @@ class Story {
           this.agreed_status = agreed_status;
           this.visibility = visibility;
           this.note = note;
+          this.sid = sid;
   }
 }
 
-module.exports = Story;
+module.exports = StorySession;

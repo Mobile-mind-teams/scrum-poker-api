@@ -5,8 +5,22 @@ const StoryController = require("../controllers/story.controller")
 const router = express.Router()
 const controller = new StoryController()
 
-///Projects-Story
-router.post('/projects-story/add/:id',
+router.post('/add/:document_id&:story_id&:collection',
+  async (req, res, next) => {
+    try {
+      const body = req.body;
+      const document_id = req.params.document_id;
+      const story_id = req.params.story_id;
+      const collection = req.params.collection;
+      const newStory = await controller.addStoryTo(body, document_id, story_id, collection);
+      res.status(201).json(newStory);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.post('/add-project/:id',
   async (req, res, next) => {
     try {
       const body = req.body;
@@ -19,47 +33,65 @@ router.post('/projects-story/add/:id',
   }
 );
 
-router.get('/projects-story/all/:id',
+router.get('/:document_id&:story_id&:collection',
   async (req, res, next) => {
     try {
-      const stories = await controller.getAllStoriesFromProject(req.params.id);
+      const document_id = req.params.document_id
+      const story_id = req.params.story_id
+      const collection = req.params.collection
+      const story = await controller.getStoryFrom(document_id, story_id, collection);
+      res.status(200).json(story);
+    } catch (error) {
+      next(error);
+    }
+});
+
+router.patch('/update/:project_id&:story_id&:collection',
+  async (req, res, next) => {
+    try {
+      const body = req.body;
+      const project_id = req.params.project_id
+      const story_id = req.params.story_id
+      const collection = req.params.collection
+      const story = await controller.updateStoryFrom(body, project_id, story_id, collection);
+      res.status(201).json(story);
+    } catch (error) {
+      next(error);
+    }
+});
+
+router.get('/project/all/:id',
+  async (req, res, next) => {
+    try {
+      const id = req.params.id
+      const stories = await controller.getAllStoriesFromProject(id);
       res.status(200).json(stories);
     } catch (error) {
       next(error);
     }
 });
 
-router.get('/projects-story/:project_id&:story_id',
+router.get('/session/all/:id',
   async (req, res, next) => {
     try {
-      const stories = await controller.getStoryFromProject(req.params.project_id, req.params.story_id);
+      const id = req.params.id
+      const stories = await controller.getAllStoriesFromSession(id);
       res.status(200).json(stories);
     } catch (error) {
       next(error);
     }
 });
 
-router.patch('/projects-story/update/:project_id&:story_id',
+router.get('/backlog/all/:id',
   async (req, res, next) => {
     try {
-      const user = await controller.updateStoryFromProject(req.body, req.params.project_id, req.params.story_id);
-      res.status(201).json(user);
+      const id = req.params.id
+      const stories = await controller.getAllStoriesFromBacklog(id);
+      res.status(200).json(stories);
     } catch (error) {
       next(error);
     }
 });
-
-
-
-// router.get('/:id',
-//   async (req, res, next) => {
-//     try {
-//       const user = await controller.getUser(req.params.id);
-//       res.status(200).json(user);
-//     } catch (error) {
-//       next(error);
-//     }
-// });
 
 module.exports = router
 
