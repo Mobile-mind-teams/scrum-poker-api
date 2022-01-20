@@ -6,6 +6,7 @@ const storyRouter = require('../routes/story.router');
 const backlogRouter = require('../routes/backlog.router');
 const sessionRouter = require('../routes/session.router');
 const tableCardRouter = require('../routes/table-cards.router');
+const sessionHistoryRouter = require('./session-history.router');
 
 function routerApi(app) {
   const router = express.Router();
@@ -16,6 +17,7 @@ function routerApi(app) {
   router.use('/backlogs', backlogRouter);
   router.use('/sessions', sessionRouter);
   router.use('/table-cards', tableCardRouter);
+  router.use('/session-history', sessionHistoryRouter);
 }
 
 module.exports = routerApi
