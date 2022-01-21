@@ -10,7 +10,7 @@ router.post('/add',
     try {
       const body = req.body;
       const newUser = await controller.addUser(body);
-      res.status(201).json(newUser);
+      res.status(201).json({user: newUser});
     } catch (error) {
       next(error);
     }
@@ -45,6 +45,18 @@ router.patch('/update/:id',
       const id = req.params.id;
       const user = await controller.updateUser(body, id);
       res.status(201).json(user);
+    } catch (error) {
+      next(error);
+    }
+});
+
+router.delete('/delete/:field_name&:field_value',
+  async (req, res, next) => {
+    try {
+      const field_name = req.params.field_name;
+      const field_value = req.params.field_value;
+      const result = await controller.deleteUser(field_name, field_value);
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }

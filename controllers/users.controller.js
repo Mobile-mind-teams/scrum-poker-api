@@ -6,8 +6,8 @@ class UsersController{
   constructor() {}
 
   async addUser (data) {
-    await firestore.collection("user").doc().set(data);
-    return data;
+    await firestore.collection("user").doc().set(data)
+    return data
   };
 
   async getAllUsers () {
@@ -59,6 +59,24 @@ class UsersController{
     await userToUpdate.update(data)
     return data;
   };
+
+  async deleteUser (field_name, field_value) {
+    const data = await firestore.collection("user")
+                                .where(field_name, "==", field_value)
+                                .get();
+
+    if (data.empty) {
+      return {message: "No records found" }
+    } else {
+      data.forEach((item) => {
+          firestore.collection("user")
+          .doc(item.id)
+          .delete()
+      });
+
+      return {message: "Records deleted!"}
+    }
+  }
 }
 
 module.exports = UsersController
