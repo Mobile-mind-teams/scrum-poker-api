@@ -21,7 +21,7 @@ router.get('/all',
   async (req, res, next) => {
     try {
       const users = await controller.getAllUsers();
-      res.status(200).json(users);
+      res.status(200).json({users_list: users});
     } catch (error) {
       next(error);
     }
@@ -32,7 +32,7 @@ router.get('/:id',
     try {
       const id = req.params.id;
       const user = await controller.getUser(id);
-      res.status(200).json(user);
+      res.status(200).json({user: user});
     } catch (error) {
       next(error);
     }
@@ -44,7 +44,7 @@ router.patch('/update/:id',
       const body = req.body;
       const id = req.params.id;
       const user = await controller.updateUser(body, id);
-      res.status(201).json(user);
+      res.status(201).json({updated_user: user});
     } catch (error) {
       next(error);
     }
@@ -56,7 +56,7 @@ router.delete('/delete/:field_name&:field_value',
       const field_name = req.params.field_name;
       const field_value = req.params.field_value;
       const result = await controller.deleteUser(field_name, field_value);
-      res.status(200).json(result);
+      res.status(200).json({result: result});
     } catch (error) {
       next(error);
     }
