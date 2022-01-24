@@ -1,13 +1,15 @@
-const { json } = require('body-parser');
 const firestore = require('../config/db');
 const User = require('../models/user');
-
+const ApiResponse = require('../models/api-response')
 class UsersController{
-  constructor() {}
+  constructor() {
+    this.collection = "user"
+    this.response = new ApiResponse()
+  }
 
   async addUser (data) {
-    await firestore.collection("user").doc().set(data)
-    return data
+    await firestore.collection(this.collection).doc().set(data)
+    return this.response.toApiResponse(this.collection, [data], "Success")
   };
 
   async getAllUsers () {
@@ -15,7 +17,7 @@ class UsersController{
     const data = await firestore.collection("user").get();
 
     if (data.empty) {
-      return json({message : "No records found"})
+      this.response.toApiResponseEmpty(this.collection)
     } else {
       data.forEach((item) => {
         const user = new User(
@@ -29,7 +31,7 @@ class UsersController{
         usersList.push(user);
       });
 
-      return usersList
+      return this.response.toApiResponse(this.collection, usersList, "Success")
     }
   };
 
@@ -39,7 +41,7 @@ class UsersController{
     const user = new User();
 
     if (data.empty) {
-      json({ message: "No records found" });
+      return this.response.toApiResponseEmpty(this.collection)
     } else {
       data.forEach((item) => {
           user.user_name = item.data().user_name,
@@ -50,14 +52,14 @@ class UsersController{
           user.doc_id = item.id
       });
 
-      return user
+      return this.response.toApiResponse(this.collection, [user], "Success")
     }
   };
 
   async updateUser (data,id) {
-    const userToUpdate =firestore.collection("user").doc(id);
+    const userToUpdate = firestore.collection("user").doc(id);
     await userToUpdate.update(data)
-    return data;
+    return this.response.toApiResponse(this.collection, [data], "Success")
   };
 
   async deleteUser (field_name, field_value) {
@@ -66,7 +68,7 @@ class UsersController{
                                 .get();
 
     if (data.empty) {
-      return {message: "No records found" }
+      return this.response.toApiResponseEmpty(this.collection)
     } else {
       data.forEach((item) => {
           firestore.collection("user")
@@ -74,7 +76,7 @@ class UsersController{
           .delete()
       });
 
-      return {message: "Records deleted!"}
+      return this.response.toApiResponse(this.collection, [], "Success")
     }
   }
 }
