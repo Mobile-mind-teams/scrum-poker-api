@@ -1,21 +1,24 @@
-const { json } = require('body-parser');
 const firestore = require('../config/db');
 const Session = require('../models/session');
+const ApiResponse = require('../models/api-response')
 
 class SessionController{
-  constructor() {}
+  constructor() {
+    this.collection = "session"
+    this.response = new ApiResponse()
+  }
 
   async addSession (data) {
-    await firestore.collection("session").doc().set(data);
-    return data;
+    await firestore.collection(this.collection).doc().set(data);
+    return this.response.toApiResponse(this.collection, [data], "Success!");
   };
 
   async getAllSessions () {
     const sessionList = [];
-    const data = await firestore.collection("session").get();
+    const data = await firestore.collection(this.collection).get();
 
     if (data.empty) {
-      return json({message : "No records found"})
+      return this.response.toApiResponseEmpty(this.collection)
     } else {
       data.forEach((item) => {
         const session = new Session(
@@ -30,18 +33,18 @@ class SessionController{
         sessionList.push(session);
       });
 
-      return sessionList
+      return this.response.toApiResponse(this.collection, sessionList, "Success!")
     }
   };
 
   async getSession (id){
-    const session = firestore.collection("session");
+    const session = firestore.collection(this.collection);
     const data = await session.doc(id).get();
 
-    if (data.empty) {
-      json({ message: "No records found" });
+    if (!data.exists) {
+      return this.response.toApiResponseEmpty(this.collection)
     } else {
-      return new Session(
+      const session_result = new Session(
         data.data().project_id,
         data.data().project_name,
         data.data().status,
@@ -50,13 +53,15 @@ class SessionController{
         data.data().note,
         data.id
       );
+
+      return this.response.toApiResponse(this.collection, [session_result], "Success!")
     }
   };
 
   async updateSession (data,id) {
     const sessionToUpdate =firestore.collection("session").doc(id);
     await sessionToUpdate.update(data)
-    return data;
+    return this.response.toApiResponse(this.collection, [data], "Success!");
   };
 }
 
