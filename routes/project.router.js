@@ -27,6 +27,16 @@ router.get('/all',
     }
 });
 
+router.get('/all/unassigned',
+  async (req, res, next) => {
+    try {
+      const projects = await controller.getAllProjectsToWork();
+      res.status(200).json(projects);
+    } catch (error) {
+      next(error);
+    }
+});
+
 router.get('/:id',
   async (req, res, next) => {
     try {

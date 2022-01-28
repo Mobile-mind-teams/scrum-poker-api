@@ -14,7 +14,7 @@ class UsersController{
 
   async getAllUsers () {
     const usersList = [];
-    const data = await firestore.collection("user").get();
+    const data = await firestore.collection(this.collection).get();
 
     if (data.empty) {
       this.response.toApiResponseEmpty(this.collection)
@@ -26,6 +26,34 @@ class UsersController{
           item.data().role,
           item.data().uid,
           item.data().email,
+          item.data().status,
+          item.id
+        );
+        usersList.push(user);
+      });
+
+      return this.response.toApiResponse(this.collection, usersList, "Success")
+    }
+  };
+
+  async getAllAvailableUsers () {
+    const usersList = [];
+    const data = await firestore.collection(this.collection)
+                                .where("status",'==',"available")
+                                .where("role",'!=',1)
+                                .get();
+
+    if (data.empty) {
+      this.response.toApiResponseEmpty(this.collection)
+    } else {
+      data.forEach((item) => {
+        const user = new User(
+          item.data().user_name,
+          item.data().password,
+          item.data().role,
+          item.data().uid,
+          item.data().email,
+          item.data().status,
           item.id
         );
         usersList.push(user);
@@ -36,7 +64,7 @@ class UsersController{
   };
 
   async getUser (id){
-    const users = firestore.collection("user");
+    const users = firestore.collection(this.collection);
     const data = await users.where("uid","==",id).get();
     const user = new User();
 
@@ -49,6 +77,7 @@ class UsersController{
           user.role = item.data().role,
           user.uid = item.data().uid,
           user.email = item.data().email,
+          user.status = item.data().status,
           user.doc_id = item.id
       });
 
@@ -57,13 +86,13 @@ class UsersController{
   };
 
   async updateUser (data,id) {
-    const userToUpdate = firestore.collection("user").doc(id);
+    const userToUpdate = firestore.collection(this.collection).doc(id);
     await userToUpdate.update(data)
     return this.response.toApiResponse(this.collection, [data], "Success")
   };
 
   async deleteUser (field_name, field_value) {
-    const data = await firestore.collection("user")
+    const data = await firestore.collection(this.collection)
                                 .where(field_name, "==", field_value)
                                 .get();
 
@@ -71,7 +100,7 @@ class UsersController{
       return this.response.toApiResponseEmpty(this.collection)
     } else {
       data.forEach((item) => {
-          firestore.collection("user")
+          firestore.collection(this.collection)
           .doc(item.id)
           .delete()
       });

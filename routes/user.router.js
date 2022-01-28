@@ -27,6 +27,16 @@ router.get('/all',
     }
 });
 
+router.get('/all/available',
+  async (req, res, next) => {
+    try {
+      const users = await controller.getAllAvailableUsers();
+      res.status(200).json(users);
+    } catch (error) {
+      next(error);
+    }
+});
+
 router.get('/:id',
   async (req, res, next) => {
     try {
