@@ -1,21 +1,24 @@
-const { json } = require('body-parser');
 const firestore = require('../config/db');
 const Backlog = require('../models/backlog');
+const ApiResponse = require('../models/api-response')
 
 class BacklogController{
-  constructor() {}
+  constructor() {
+    this.collection = "backlog"
+    this.response = new ApiResponse()
+  }
 
   async addBacklog (data) {
-    await firestore.collection("backlog").doc().set(data);
-    return data;
+    await firestore.collection(this.collection).doc().set(data);
+    return this.response.toApiResponse(this.collection,[data],"Success!");
   };
 
   async getAllBacklogs () {
     const backlogList = [];
-    const data = await firestore.collection("backlog").get();
+    const data = await firestore.collection(this.collection).get();
 
     if (data.empty) {
-      return json({message : "No records found"})
+      return this.response.toApiResponseEmpty(this.collection)
     } else {
       data.forEach((item) => {
         const backlog = new Backlog(
@@ -30,18 +33,18 @@ class BacklogController{
         backlogList.push(backlog);
       });
 
-      return backlogList
+      return this.response.toApiResponse(this.collection,backlogList,"Success!")
     }
   };
 
   async getBacklog (id){
-    const backlog = firestore.collection("backlog");
+    const backlog = firestore.collection(this.collection);
     const data = await backlog.doc(id).get();
 
     if (data.empty) {
-      json({ message: "No records found" });
+      return this.response.toApiResponseEmpty(this.collection)
     } else {
-      return new Backlog(
+      const result = new Backlog(
         data.data().project_id,
         data.data().project_name,
         data.data().session_id,
@@ -50,13 +53,15 @@ class BacklogController{
         data.data().status,
         data.id
       );
+
+      return this.response.toApiResponse(this.collection,[result],"Success!");
     }
   };
 
   async updateBacklog (data,id) {
-    const backlogToUpdate =firestore.collection("backlog").doc(id);
+    const backlogToUpdate =firestore.collection(this.collection).doc(id);
     await backlogToUpdate.update(data)
-    return data;
+    return this.response.toApiResponse(this.collection,[data],"Success!");
   };
 }
 

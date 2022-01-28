@@ -1,63 +1,75 @@
-const { json } = require('body-parser');
 const firestore = require('../config/db');
 const StorySession = require('../models/story-session');
 const StoryProject = require('../models/story-project');
 const StoryBacklog = require('../models/story-backlog');
+const ApiResponse = require('../models/api-response')
 
 class StoryController{
-  constructor() {}
+  constructor() {
+    this.collection = "story"
+    this.response = new ApiResponse()
+  }
 
   //Project-Stories
   async addStoryToProject (data, id) {
-    await firestore.collection("project").doc(id).collection("story").doc().set(data);
-    return data;
+    await firestore.collection("project").doc(id).collection(this.collection).doc().set(data);
+    return this.response.toApiResponse(this.collection,[data], "Success!");
   };
 
   //Session-Backlog
   async addStoryTo (data, document_id, story_id, collection) {
-    await firestore.collection(collection).doc(document_id).collection("story").doc(story_id).set(data);
-    return data;
+    await firestore.collection(collection).doc(document_id).collection(this.collection).doc(story_id).set(data);
+    return this.response.toApiResponse(collection,[data], "Success!");;
   };
 
   async updateStoryFrom (data, project_id, story_id, collection) {
     const storyToUpdate =firestore.collection(collection).doc(project_id);
-    await storyToUpdate.collection("story").doc(story_id).update(data)
-    return data;
+    await storyToUpdate.collection(collection).doc(story_id).update(data)
+    return this.response.toApiResponse(collection,[data], "Success!");;
   };
 
   async getStoryFrom (document_id, story_id, collection){
     const story = firestore.collection(collection).doc(document_id);
-    const data = await story.collection("story").doc(story_id).get();
+    const data = await story.collection(collection).doc(story_id).get();
 
     if (data.empty) {
-      json({ message: "No records found" });
+      return this.response.toApiResponseEmpty(collection)
     } else {
 
       switch(collection){
         case "project":
-          return new StoryProject(
-            data.data().title,
-            data.data().description,
-            data.id
-          );
+          return this.response.toApiResponse(
+            this.collection,
+            [new StoryProject(
+              data.data().title,
+              data.data().description,
+              data.id
+            )],
+            "Success!");
         case "session":
-          return new StorySession(
-            data.data().title,
-            data.data().description,
-            data.data().weight,
-            data.data().read_status,
-            data.data().agreed_status,
-            data.data().visibility,
-            data.data().note,
-            data.id
-          );
-          case "backlog":
-            return new StoryBacklog(
+          return this.response.toApiResponse(
+            this.collection,
+            [new StorySession(
               data.data().title,
               data.data().description,
               data.data().weight,
+              data.data().read_status,
+              data.data().agreed_status,
+              data.data().visibility,
+              data.data().note,
               data.id
-            );
+            )],
+            "Success!");
+          case "backlog":
+            return this.response.toApiResponse(
+              this.collection,
+              [new StoryBacklog(
+                data.data().title,
+                data.data().description,
+                data.data().weight,
+                data.id
+              )],
+              "Success!");
       }
     }
   };
@@ -67,7 +79,7 @@ class StoryController{
     const data = await firestore.collection("project").doc(id).collection("story").get();
 
     if (data.empty) {
-      return json({message : "No records found"})
+      return this.response.toApiResponseEmpty(this.collection)
     } else {
       data.forEach((item) => {
         const story = new StoryProject(
@@ -77,7 +89,7 @@ class StoryController{
         );
         storyList.push(story);
       });
-      return storyList
+      return this.response.toApiResponse(this.collection,storyList, "Success!");;
     }
   };
 
@@ -87,7 +99,7 @@ class StoryController{
     const data = await firestore.collection("session").doc(id).collection("story").get();
 
     if (data.empty) {
-      return json({message : "No records found"})
+      return this.response.toApiResponseEmpty(this.collection)
     } else {
       data.forEach((item) => {
         const story = new StorySession(
@@ -102,7 +114,7 @@ class StoryController{
         );
         storyList.push(story);
       });
-      return storyList
+      return this.response.toApiResponse(this.collection,storyList, "Success!");;
     }
   };
 
@@ -112,7 +124,7 @@ class StoryController{
     const data = await firestore.collection("backlog").doc(id).collection("story").get();
 
     if (data.empty) {
-      return json({message : "No records found"})
+      return this.response.toApiResponseEmpty(this.collection)
     } else {
       data.forEach((item) => {
         const story = new StoryBacklog(
@@ -123,7 +135,7 @@ class StoryController{
         );
         storyList.push(story);
       });
-      return storyList
+      return this.response.toApiResponse(this.collection,storyList, "Success!");;
     }
   };
 }
