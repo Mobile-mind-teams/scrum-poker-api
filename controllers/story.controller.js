@@ -121,7 +121,7 @@ class StoryController{
   //Backlog-Stories
   async getAllStoriesFromBacklog (id) {
     const storyList = [];
-    const data = await firestore.collection("backlog").doc(id).collection("story").get();
+    const data = await firestore.collection("backlog").doc(id).collection(this.collection).get();
 
     if (data.empty) {
       return this.response.toApiResponseEmpty(this.collection)
