@@ -37,6 +37,31 @@ class SessionController{
     }
   };
 
+  async getAllSessionsByAdminId (id) {
+    const sessionList = [];
+    const data = await firestore.collection(this.collection)
+                        .where("admin_id","==",id).get();
+
+    if (data.empty) {
+      return this.response.toApiResponseEmpty(this.collection)
+    } else {
+      data.forEach((item) => {
+        const session = new Session(
+          item.data().project_id,
+          item.data().project_name,
+          item.data().status,
+          item.data().started_at,
+          item.data().finished_at,
+          item.data().note,
+          item.id
+        );
+        sessionList.push(session);
+      });
+
+      return this.response.toApiResponse(this.collection, sessionList, "Success!")
+    }
+  };
+
   async getSession (id){
     const session = firestore.collection(this.collection);
     const data = await session.doc(id).get();

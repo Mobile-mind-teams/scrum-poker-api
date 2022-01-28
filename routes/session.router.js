@@ -27,6 +27,17 @@ router.get('/all',
     }
 });
 
+router.get('/all/:id',
+  async (req, res, next) => {
+    try {
+      const id = req.params.id
+      const sessions = await controller.getAllSessionsByAdminId(id);
+      res.status(200).json(sessions);
+    } catch (error) {
+      next(error);
+    }
+});
+
 router.get('/:id',
   async (req, res, next) => {
     try {
