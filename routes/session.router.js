@@ -38,11 +38,34 @@ router.get('/all/:id',
     }
 });
 
+router.get('/:id&:status',
+  async (req, res, next) => {
+    try {
+      const id = req.params.id
+      const status = req.params.status
+      const sessions = await controller.getSessionsByIdAndStatus(id,status);
+      res.status(200).json(sessions);
+    } catch (error) {
+      next(error);
+    }
+});
+
 router.get('/:id',
   async (req, res, next) => {
     try {
       const id = req.params.id;
       const session = await controller.getSession(id);
+      res.status(200).json(session);
+    } catch (error) {
+      next(error);
+    }
+});
+
+router.get('/team/:email',
+  async (req, res, next) => {
+    try {
+      const email = req.params.email;
+      const session = await controller.getSessionByTeamMemberEmail(email);
       res.status(200).json(session);
     } catch (error) {
       next(error);

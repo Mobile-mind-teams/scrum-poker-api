@@ -28,7 +28,9 @@ class SessionController{
           item.data().started_at,
           item.data().finished_at,
           item.data().note,
-          item.id
+          item.id,
+          item.data().admin_id,
+          item.data().team
         );
         sessionList.push(session);
       });
@@ -53,7 +55,38 @@ class SessionController{
           item.data().started_at,
           item.data().finished_at,
           item.data().note,
-          item.id
+          item.id,
+          item.data().admin_id,
+          item.data().team
+        );
+        sessionList.push(session);
+      });
+
+      return this.response.toApiResponse(this.collection, sessionList, "Success!")
+    }
+  };
+
+  async getSessionsByIdAndStatus (id,status) {
+    const sessionList = [];
+    const data = await firestore.collection(this.collection)
+                        .where("admin_id","==",id)
+                        .where("status","==",status)
+                        .get();
+
+    if (data.empty) {
+      return this.response.toApiResponseEmpty(this.collection)
+    } else {
+      data.forEach((item) => {
+        const session = new Session(
+          item.data().project_id,
+          item.data().project_name,
+          item.data().status,
+          item.data().started_at,
+          item.data().finished_at,
+          item.data().note,
+          item.id,
+          item.data().admin_id,
+          item.data().team
         );
         sessionList.push(session);
       });
@@ -76,10 +109,40 @@ class SessionController{
         data.data().started_at,
         data.data().finished_at,
         data.data().note,
-        data.id
+        data.id,
+        data.data().admin_id,
+        data.data().team
       );
 
       return this.response.toApiResponse(this.collection, [session_result], "Success!")
+    }
+  };
+
+  async getSessionByTeamMemberEmail (email){
+    const sessionList = [];
+    const data = await firestore.collection(this.collection)
+                        .where("team","array-contains",email)
+                        .get();
+
+    if (data.empty) {
+      return this.response.toApiResponseEmpty(this.collection)
+    } else {
+      data.forEach((item) => {
+        const session = new Session(
+          item.data().project_id,
+          item.data().project_name,
+          item.data().status,
+          item.data().started_at,
+          item.data().finished_at,
+          item.data().note,
+          item.id,
+          item.data().admin_id,
+          item.data().team
+        );
+        sessionList.push(session);
+      });
+
+      return this.response.toApiResponse(this.collection, sessionList, "Success!")
     }
   };
 
