@@ -8,6 +8,7 @@ const sessionRouter = require('../routes/session.router');
 const tableCardRouter = require('../routes/table-cards.router');
 const sessionHistoryRouter = require('./session-history.router');
 const emailRouter = require('./email.router');
+const cardRouter = require('./card.router');
 
 function routerApi(app) {
   const router = express.Router();
@@ -20,6 +21,7 @@ function routerApi(app) {
   router.use('/table-cards', tableCardRouter);
   router.use('/session-history', sessionHistoryRouter);
   router.use('/email', emailRouter);
+  router.use('/cards', cardRouter);
 }
 
 module.exports = routerApi
