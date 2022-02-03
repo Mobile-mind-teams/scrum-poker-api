@@ -22,12 +22,13 @@ class TableCardController{
     } else {
       data.forEach((item) => {
         const card = new TableCard(
-          item.data().value,
-          item.data().description,
           item.data().user_id,
+          item.data().value,
+          item.data().action,
           item.data().visibility,
           item.data().story_id,
-          item.id
+          item.id,
+          item.data().name,
         );
         cardList.push(card);
       });
@@ -43,13 +44,14 @@ class TableCardController{
     if (data.empty) {
       return this.response.toApiResponseEmpty(this.collection)
     } else {
-      const card = TableCard(
-        data.data().value,
-        data.data().description,
-        data.data().user_id,
-        data.data().visibility,
-        data.data().story_id,
-        data.id
+      const card = new TableCard(
+          data.data().user_id,
+          data.data().value,
+          data.data().action,
+          data.data().visibility,
+          data.data().story_id,
+          data.id,
+          data.data().name,
       );
 
       return this.response.toApiResponse(this.collection,[card],"Success!")
@@ -65,7 +67,7 @@ class TableCardController{
   async resetTable (document_id, story_id) {
     const data = await firestore.collection("session")
                                 .doc(document_id)
-                                .collection("table-card")
+                                .collection(this.collection)
                                 .where("story_id", "==", story_id)
                                 .get();
 
@@ -75,7 +77,7 @@ class TableCardController{
       data.forEach((item) => {
           firestore.collection("session")
           .doc(document_id)
-          .collection("table-card")
+          .collection(this.collection)
           .doc(item.id)
           .delete()
       });
