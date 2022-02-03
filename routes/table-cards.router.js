@@ -10,8 +10,8 @@ router.post('/add/:document_id',
     try {
       const body = req.body;
       const document_id = req.params.document_id;
-      const newStory = await controller.addCard(body, document_id);
-      res.status(201).json(newStory);
+      const newCard = await controller.addCard(body, document_id);
+      res.status(201).json(newCard);
     } catch (error) {
       next(error);
     }

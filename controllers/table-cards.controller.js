@@ -1,21 +1,24 @@
-const { json } = require('body-parser');
 const firestore = require('../config/db');
 const TableCard = require('../models/table-card');
+const ApiResponse = require('../models/api-response')
 
 class TableCardController{
-  constructor() {}
+  constructor() {
+    this.collection = "table-card"
+    this.response = new ApiResponse()
+  }
 
   async addCard (data, document_id) {
-    await firestore.collection("session").doc(document_id).collection("table-card").doc().set(data);
-    return data;
+    await firestore.collection("session").doc(document_id).collection(this.collection).doc().set(data);
+    return this.response.toApiResponse(this.collection,[data],"Success");
   };
 
   async getAllCards (id) {
     const cardList = [];
-    const data = await firestore.collection("session").doc(id).collection("table-card").get();
+    const data = await firestore.collection("session").doc(id).collection(this.collection).get();
 
     if (data.empty) {
-      return json({message : "No records found"})
+      return this.response.toApiResponseEmpty(this.collection)
     } else {
       data.forEach((item) => {
         const card = new TableCard(
@@ -29,18 +32,18 @@ class TableCardController{
         cardList.push(card);
       });
 
-      return cardList
+      return this.response.toApiResponse(this.collection,cardList,"Success!")
     }
   };
 
   async getCard (document_id, card_id){
-    const card = firestore.collection("session").doc(document_id).collection("table-card");
+    const card = firestore.collection("session").doc(document_id).collection(this.collection);
     const data = await card.doc(card_id).get();
 
     if (data.empty) {
-      json({ message: "No records found" });
+      return this.response.toApiResponseEmpty(this.collection)
     } else {
-      return new TableCard(
+      const card = TableCard(
         data.data().value,
         data.data().description,
         data.data().user_id,
@@ -48,13 +51,15 @@ class TableCardController{
         data.data().story_id,
         data.id
       );
+
+      return this.response.toApiResponse(this.collection,[card],"Success!")
     }
   };
 
   async updateTableCard (data, document_id, card_id) {
     const tableCardToUpdate = firestore.collection("session").doc(document_id).collection("table-card").doc(card_id);
     await tableCardToUpdate.update(data)
-    return data;
+    return this.response.toApiResponse(this.collection,[data],"Success!")
   };
 
   async resetTable (document_id, story_id) {
@@ -65,7 +70,7 @@ class TableCardController{
                                 .get();
 
     if (data.empty) {
-      return {"message": "No records found" }
+      return this.response.toApiResponseEmpty(this.collection)
     } else {
       data.forEach((item) => {
           firestore.collection("session")
@@ -75,7 +80,7 @@ class TableCardController{
           .delete()
       });
 
-      return {"message": "Records deleted!"}
+      return this.response.toApiResponse(this.collection,[],"Success!")
     }
   }
 }
