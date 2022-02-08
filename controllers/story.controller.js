@@ -22,10 +22,19 @@ class StoryController{
     return this.response.toApiResponse(collection,[data], "Success!");;
   };
 
-  async updateStoryFrom (data, project_id, story_id, collection) {
-    const storyToUpdate =firestore.collection(collection).doc(project_id);
-    await storyToUpdate.collection(collection).doc(story_id).update(data)
-    return this.response.toApiResponse(collection,[data], "Success!");;
+  // async updateStoryFrom (data, project_id, story_id, collection) {
+  //   const storyToUpdate =firestore.collection(collection).doc(project_id);
+  //   await storyToUpdate.collection(collection).doc(story_id).update(data)
+  //   return this.response.toApiResponse(collection,[data], "Success!");;
+  // };
+
+  async updateStoryFrom (data, document_id, story_id, collection) {
+    const storyToUpdate = firestore.collection(collection)
+                                    .doc(document_id)
+                                    .collection(this.collection)
+                                    .doc(story_id);
+    await storyToUpdate.update(data)
+    return this.response.toApiResponse(this.collection,[data], "Success!");;
   };
 
   async getStoryFrom (document_id, story_id, collection){

@@ -46,14 +46,14 @@ router.get('/:document_id&:story_id&:collection',
     }
 });
 
-router.patch('/update/:project_id&:story_id&:collection',
+router.patch('/update/:document_id&:story_id&:collection',
   async (req, res, next) => {
     try {
       const body = req.body;
-      const project_id = req.params.project_id
+      const document_id = req.params.document_id
       const story_id = req.params.story_id
       const collection = req.params.collection
-      const story = await controller.updateStoryFrom(body, project_id, story_id, collection);
+      const story = await controller.updateStoryFrom(body, document_id, story_id, collection);
       res.status(201).json(story);
     } catch (error) {
       next(error);
