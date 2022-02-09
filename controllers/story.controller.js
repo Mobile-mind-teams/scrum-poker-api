@@ -22,12 +22,6 @@ class StoryController{
     return this.response.toApiResponse(collection,[data], "Success!");;
   };
 
-  // async updateStoryFrom (data, project_id, story_id, collection) {
-  //   const storyToUpdate =firestore.collection(collection).doc(project_id);
-  //   await storyToUpdate.collection(collection).doc(story_id).update(data)
-  //   return this.response.toApiResponse(collection,[data], "Success!");;
-  // };
-
   async updateStoryFrom (data, document_id, story_id, collection) {
     const storyToUpdate = firestore.collection(collection)
                                     .doc(document_id)
@@ -105,7 +99,11 @@ class StoryController{
   //Session-Story
   async getAllStoriesFromSession (id) {
     const storyList = [];
-    const data = await firestore.collection("session").doc(id).collection("story").get();
+    const stories = firestore.collection("session")
+                                .doc(id)
+                                .collection("story")
+    const data = await stories.where("agreed_status", "==", false)
+                                .get();
 
     if (data.empty) {
       return this.response.toApiResponseEmpty(this.collection)
