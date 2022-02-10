@@ -1,7 +1,10 @@
 class Project {
-  constructor(project_name, pid, story_list) {
-          this.project_name = project_name;
-          this.story_list = story_list;
+  constructor(name, pid, sid, bid, status) {
+          this.name = name;
+          this.pid = pid;
+          this.sid = sid;
+          this.bid = bid;
+          this.status = status;
   }
 }
 

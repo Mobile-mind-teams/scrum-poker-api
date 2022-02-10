@@ -1,82 +1,90 @@
 const firestore = require('../config/db');
 const Project = require('../models/project');
+const ApiResponse = require('../models/api-response')
 
-// const addProject = async (req, res) => {
-//   try {
-//     const data = req.body;
-//     await firestore.collection("project").doc().set(data);
-//     res.status(201).json({ message: "Record saved successfully" });
-//   } catch (error) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
+class ProjectController{
+  constructor() {
+    this.collection = "project"
+    this.response = new ApiResponse()
+  }
 
-// const getAllProjects = async (req, res) => {
-//   try {
-//     const projects = firestore.collection("project");
-//     const data = await projects.get();
-//     const arr = [];
-//     if (data.empty) {
-//       res.status(200).json({ message: "No records found" });
-//     } else {
-//       let total = 0;
-//       data.forEach((item) => {
-//         const project = new Project(
-//           item.data().project_name,
-//           item.id,
-//           item.data().story_list,
-//         );
-//         arr.push(project);
-//         total = total + 1;
-//       });
-//       res.status(200).json({
-//         listing: arr,
-//         count: total
-//       });
-//     }
-//   } catch (error) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
+  async addProject (data) {
+    await firestore.collection(this.collection).doc().set(data);
+    return this.response.toApiResponse(this.collection,[data],"Success!");
+  };
 
-// const getProject = async (req, res) => {
-//   try {
-//     const projects = firestore.collection("project");
-//     const data = await projects.doc(req.params.id).get();
-//     const projectResult = [];
-//     if (data.empty) {
-//       res.status(200).json({ message: "No records found" });
-//     } else {
-//       data.forEach((item) => {
-//         const project = new Project(
-//           item.data().project_name,
-//           item.id,
-//           item.data().story_list,
-//         );
+  async getAllProjects () {
+    const projectList = [];
+    const data = await firestore.collection(this.collection).get();
 
-//         projectResult.push(project);
-//       });
-//       res.status(200).json({projectResult})
-//     }
-//   } catch (error) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
+    if (data.empty) {
+      return this.response.toApiResponseEmpty(this.collection)
+    } else {
+      data.forEach((item) => {
+        const project = new Project(
+          item.data().name,
+          item.id,
+          item.data().sid,
+          item.data().bid,
+          item.data().status
+        );
+        projectList.push(project);
+      });
 
-// const updateProject = async (req, res) => {
-//   try {
-//     const data = req.body;
-//     const projectUpdate = firestore.collection("project").doc(req.params.id);
-//     await projectUpdate.update(data)
-//     res.status(201).json({ message: "Record updated successfully" });
-//   } catch (error) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
+      return this.response.toApiResponse(this.collection,projectList,"Success!");
+    }
+  };
 
-// module.exports = {
-//   addProject,
-//   updateProject,
-//   getAllProjects,
-//   getProject
-// }
+  async getAllProjectsToWork () {
+    const projectList = [];
+    const data = await firestore.collection(this.collection)
+                  .where("status","==","unassigned")
+                  .get();
+
+    if (data.empty) {
+      return this.response.toApiResponseEmpty(this.collection)
+    } else {
+      data.forEach((item) => {
+        const project = new Project(
+          item.data().name,
+          item.id,
+          item.data().sid,
+          item.data().bid,
+          item.data().status
+        );
+        projectList.push(project);
+      });
+
+      return this.response.toApiResponse(this.collection,projectList,"Success!");
+    }
+  };
+
+  async getProject (id){
+    const project = firestore.collection(this.collection);
+    const data = await project.doc(id).get();
+
+    if (data.empty) {
+      this.response.toApiResponseEmpty(this.collection)
+    } else {
+      return this.response.toApiResponse(
+        this.collection,
+        [
+          new Project(
+            data.data().name,
+            data.id,
+            data.data().sid,
+            data.data().bid,
+            data.data().status)
+        ],
+        "Success!");
+    }
+  };
+
+  async updateProject (data,id) {
+    const proyectToUpdate =firestore.collection(this.collection).doc(id);
+    await proyectToUpdate.update(data)
+    return this.response.toApiResponse(this.collection,[data],"Success!");
+  };
+}
+
+module.exports = ProjectController
