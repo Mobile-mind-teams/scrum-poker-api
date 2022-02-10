@@ -12,8 +12,24 @@ const cardRouter = require('./card.router');
 
 function routerApi(app) {
   const router = express.Router();
+  //V1 root
   // app.use('/scrum-poker/v1', router);
-  app.use('/v2', router);
+
+  //V2 heroku deployment root
+  app.use('/', router);
+
+  //Test Route
+  router.get('/',
+    async (req, res, next) => {
+      try {
+        res.status(200).json({message: "Succes!"});
+      } catch (error) {
+        res.status(500).json({message: "Error!"});
+        next(error);
+      }
+    }
+  );
+
   router.use('/users', userRouter);
   router.use('/projects', projectRouter);
   router.use('/stories', storyRouter);
