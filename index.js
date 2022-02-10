@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const routerApi = require("../scrum-poker-api/routes/index")
+const routerApi = require("./routes/index")
 const app = express();
 
 // Configuring Express
