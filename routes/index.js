@@ -12,7 +12,8 @@ const cardRouter = require('./card.router');
 
 function routerApi(app) {
   const router = express.Router();
-  app.use('/scrum-poker/v1', router);
+  // app.use('/scrum-poker/v1', router);
+  app.use('/v2', router);
   router.use('/users', userRouter);
   router.use('/projects', projectRouter);
   router.use('/stories', storyRouter);
