@@ -15,4 +15,5 @@ routerApi(app)
 const PORT = process.env.PORT || 5000;
 
 // Listen for URIs on a port
+// eslint-disable-next-line no-console
 app.listen(PORT, () => console.log(`Server started at ${PORT}`));
