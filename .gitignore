@@ -201,7 +201,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-serviceAccountKey.json
-email.transporter.js
+#serviceAccountKey.json
+#email.transporter.js
 
 # End of https://www.toptal.com/developers/gitignore/api/node,windows,linux,macos
