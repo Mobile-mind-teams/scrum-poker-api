@@ -125,12 +125,12 @@ class StoryController{
     }
   };
 
-  async getAllStoriesFromSessionByStatusType (id, status_type, value) {
+  async getAllAgreedStoriesFromSession (id) {
     const storyList = [];
     const stories = firestore.collection("session")
                                 .doc(id)
                                 .collection(this.collection)
-    const data = await stories.where(status_type, "==", value)
+    const data = await stories.where("agreed_status", "==", true)
                                 .get();
 
     if (data.empty) {

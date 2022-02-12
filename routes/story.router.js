@@ -82,13 +82,11 @@ router.get('/session/all/:id',
     }
 });
 
-router.get('/session/all/:id&:status_type&:value',
+router.get('/session/agreed/all/:id',
   async (req, res, next) => {
     try {
       const id = req.params.id
-      const status_type = req.params.status_type
-      const value = req.params.value
-      const stories = await controller.getAllStoriesFromSessionByStatusType(id, status_type, value);
+      const stories = await controller.getAllAgreedStoriesFromSession(id);
       res.status(200).json(stories);
     } catch (error) {
       next(error);
