@@ -125,6 +125,34 @@ class StoryController{
     }
   };
 
+  async getAllStoriesFromSessionByStatusType (id, status_type, value) {
+    const storyList = [];
+    const stories = firestore.collection("session")
+                                .doc(id)
+                                .collection(this.collection)
+    const data = await stories.where(status_type, "==", value)
+                                .get();
+
+    if (data.empty) {
+      return this.response.toApiResponseEmpty(this.collection)
+    } else {
+      data.forEach((item) => {
+        const story = new StorySession(
+          item.data().title,
+          item.data().description,
+          item.data().weight,
+          item.data().read_status,
+          item.data().agreed_status,
+          item.data().visibility,
+          item.data().note,
+          item.id
+        );
+        storyList.push(story);
+      });
+      return this.response.toApiResponse(this.collection,storyList, "Success!");;
+    }
+  };
+
   //Backlog-Stories
   async getAllStoriesFromBacklog (id) {
     const storyList = [];
